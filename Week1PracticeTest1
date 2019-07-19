@@ -1,0 +1,16 @@
+#Tokenize the words and sentences, building up the dictionary to make corpus
+from tensorflow.keras.preprocessing.text import Tokenizer 
+
+sentences = [
+    'i love dog!',
+    'I, love cat',
+    'You love dogs'
+]
+ #Tokenizer does all the heavy lifting of managing tokens, turning your text into streams of tokens etc
+ #What fit on texts will then do is it will go through the entire body of text and it will create a dictionary 
+ # with the key being the word and the value being the token for that word. 
+tokenizer = Tokenizer(num_words=100)
+tokenizer.fit_on_texts(sentences)
+word_index = tokenizer.word_index
+#when printing ignoring punctuations and spacing (i and I are same words)
+print(word_index)
