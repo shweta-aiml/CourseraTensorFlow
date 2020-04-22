@@ -1,0 +1,320 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled",
+      "provenance": [],
+      "authorship_tag": "ABX9TyM3jt0PKOIxGqgstFU6Fyy/",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/shweta-aiml/CourseraTensorFlow/blob/master/Use-cases%20of%20Google%E2%80%99s%20Universal%20Sentence%20Encoder\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "B_QCOqUivzfR",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "import tensorflow as tf\n",
+        "import tensorflow_hub as hub\n",
+        "import numpy as np\n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "U9FiFeocv4V5",
+        "colab_type": "code",
+        "outputId": "14181780-332b-4f2f-ed33-5dd8986d93d3",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 153
+        }
+      },
+      "source": [
+        "#download the model to local so it can be used again and again\n",
+        "!mkdir ../sentence_wise_email/module/module_useT\n",
+        "# Download the module, and uncompress it to the destination folder. \n",
+        "!curl -L \"https://tfhub.dev/google/universal-sentence-encoder-large/3?tf-hub-format=compressed\" | tar -zxvC ../sentence_wise_email/module/module_useT"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "mkdir: cannot create directory ‘../sentence_wise_email/module/module_useT’: No such file or directory\n",
+            "  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n",
+            "                                 Dload  Upload   Total   Spent    Left  Speed\n",
+            "  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0\n",
+            "tar: ../sentence_wise_email/module/module_useT: Cannot open: No such file or directory\n",
+            "tar: Error is not recoverable: exiting now\n",
+            "  0  745M    0  212k    0     0   825k      0  0:15:24 --:--:--  0:15:24  825k\n",
+            "curl: (23) Failed writing body (1199 != 1386)\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "oUufJ2GBwBxM",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "source": [
+        "embed = hub.load(\"https://tfhub.dev/google/nnlm-en-dim50/2\")"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "l8cQ7Xc8yLR6",
+        "colab_type": "code",
+        "outputId": "4dbd9508-a382-4b68-9962-f8092c872cb2",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 153
+        }
+      },
+      "source": [
+        "message_embeddings = embed([\"cat is on the mat\", \"dog is in the fog\"])\n",
+        "for i, message_embedding in enumerate(np.array(message_embeddings).tolist()):\n",
+        "        print(\"Message: {}\".format(messages[i]))\n",
+        "        print(\"Embedding size: {}\".format(len(message_embedding)))\n",
+        "        message_embedding_snippet = \", \".join((str(x) for x in message_embedding[:3]))\n",
+        "        print(\"Embedding[{},...]\\n\".\n",
+        "                   format(message_embedding_snippet))"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Message: Elephant\n",
+            "Embedding size: 50\n",
+            "Embedding[0.16589954495429993, 0.025496501475572586, 0.157485693693161,...]\n",
+            "\n",
+            "Message: I am a sentence for which I would like to get its embedding.\n",
+            "Embedding size: 50\n",
+            "Embedding[0.14378640055656433, 0.08291594684123993, 0.10897306352853775,...]\n",
+            "\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "robBoMpPwi4m",
+        "colab_type": "code",
+        "outputId": "147aaaf1-b209-4361-ac2d-bb28769d2db3",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 241
+        }
+      },
+      "source": [
+        "# Compute a representation for each message, showing various lengths supported.\n",
+        "word = \"Elephant\"\n",
+        "sentence = \"I am a sentence for which I would like to get its embedding.\"\n",
+        "paragraph = (\n",
+        "    \"Universal Sentence Encoder embeddings also support short paragraphs. \"\n",
+        "    \"There is no hard limit on how long the paragraph is. Roughly, the longer \"\n",
+        "    \"the more 'diluted' the embedding will be.\")\n",
+        "messages = [word, sentence, paragraph]\n",
+        "message_embeddings = (embed(messages))\n",
+        "\n",
+        "# Reduce logging output.\n",
+        "#tf.logging.set_verbosity(tf.logging.ERROR)\n",
+        "for i, message_embedding in enumerate(np.array(message_embeddings).tolist()):\n",
+        "        print(\"Message: {}\".format(messages[i]))\n",
+        "        print(\"Embedding size: {}\".format(len(message_embedding)))\n",
+        "        message_embedding_snippet = \", \".join((str(x) for x in message_embedding[:3]))\n",
+        "        print(\"Embedding[{},...]\\n\".\n",
+        "                   format(message_embedding_snippet))"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Message: Elephant\n",
+            "Embedding size: 50\n",
+            "Embedding[-0.060219962149858475, -0.21514824032783508, 0.11662692576646805,...]\n",
+            "\n",
+            "Message: I am a sentence for which I would like to get its embedding.\n",
+            "Embedding size: 50\n",
+            "Embedding[0.07146047800779343, -0.07742629945278168, -0.06530147045850754,...]\n",
+            "\n",
+            "Message: Universal Sentence Encoder embeddings also support short paragraphs. There is no hard limit on how long the paragraph is. Roughly, the longer the more 'diluted' the embedding will be.\n",
+            "Embedding size: 50\n",
+            "Embedding[0.3239908516407013, 0.2072935700416565, 0.350124716758728,...]\n",
+            "\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "eqWksEpVyayV",
+        "colab_type": "code",
+        "outputId": "fc712883-c787-4ea9-c88a-d9f548ecbd9a",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 119
+        }
+      },
+      "source": [
+        "#Function so that one session can be called multiple times. \n",
+        "#Useful while multiple calls need to be done for embedding. \n",
+        "import tensorflow as tf\n",
+        "import tensorflow_hub as hub\n",
+        "embed_fn = embed = hub.load(\"https://tfhub.dev/google/nnlm-en-dim50/2\")\n",
+        "messages = [\n",
+        "    \"we are sorry for the inconvenience\",\n",
+        "    \"we are sorry for the delay\",\n",
+        "    \"we regret for your inconvenience\",\n",
+        "    \"we don't deliver to baner region in pune\",\n",
+        "    \"we will get you the best possible rate\"\n",
+        "]\n",
+        "encoding_matrix = embed_fn(messages)\n",
+        "import numpy as np\n",
+        "np.inner(encoding_matrix, encoding_matrix)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([[1.1200529 , 0.95535773, 0.91442233, 0.38438547, 0.5922484 ],\n",
+              "       [0.95535773, 0.959942  , 0.8207732 , 0.34344047, 0.5508451 ],\n",
+              "       [0.91442233, 0.8207732 , 1.3443552 , 0.32904235, 0.54267824],\n",
+              "       [0.38438547, 0.34344047, 0.32904235, 1.3194811 , 0.6858644 ],\n",
+              "       [0.5922484 , 0.5508451 , 0.54267824, 0.6858644 , 1.5094695 ]],\n",
+              "      dtype=float32)"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 17
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "ZMijay9A09Wn",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 68
+        },
+        "outputId": "f763c9cb-7efb-4aeb-cdcd-224a2b9a275b"
+      },
+      "source": [
+        "#It takes similarity matrix (generated from sentence encoder) as input and gives index of redundant statements\n",
+        "def redundant_sent_idx(sim_matrix):\n",
+        "    dup_idx = [] \n",
+        "    for i in range(sim_matrix.shape[0]):\n",
+        "        if i not in dup_idx:\n",
+        "            tmp = [t+i+1 for t in list(np.where( sim_matrix[i][i+1:] > 0.8 )[0])]\n",
+        "            dup_idx.extend(tmp)\n",
+        "    return dup_idx\n",
+        "#indexes of duplicate statements.\n",
+        "dup_indexes  = redundant_sent_idx(np.inner(encoding_matrix,\n",
+        "                                           encoding_matrix))\n",
+        "unique_messages = np.delete(np.array(messages), dup_indexes)\n",
+        "unique_messages"
+      ],
+      "execution_count": 20,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array(['we are sorry for the inconvenience',\n",
+              "       \"we don't deliver to baner region in pune\",\n",
+              "       'we will get you the best possible rate'], dtype='<U40')"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 20
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "RZwlmjm31UTy",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        },
+        "outputId": "0755f536-5ff0-4aea-8e4c-8d0764819b5e"
+      },
+      "source": [
+        "greets = [\"What's up?\",\n",
+        " 'It is a pleasure to meet you.',\n",
+        " 'How do you do?',\n",
+        " 'Top of the morning to you!',\n",
+        " 'Hi',\n",
+        " 'How are you doing?',\n",
+        " 'Hello',\n",
+        " 'Greetings!',\n",
+        " 'Hi, How is it going?',\n",
+        " 'Hi, nice to meet you.',\n",
+        " 'Nice to meet you.']\n",
+        "\n",
+        "greet_matrix = embed_fn(greets)\n",
+        "test_text = \"Hey, how are you ?\"\n",
+        "test_embed = embed_fn([test_text])\n",
+        "np.inner(test_embed, greet_matrix)\n",
+        "sim_matrix  = np.inner(test_embed, greet_matrix)\n",
+        "if sim_matrix.max() > 0.8:\n",
+        "    print(\"it is a greetings\")\n",
+        "else:\n",
+        "    print(\"it is not a greetings\")"
+      ],
+      "execution_count": 26,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "it is a greetings\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    }
+  ]
+}
